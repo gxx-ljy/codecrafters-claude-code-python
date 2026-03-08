@@ -19,8 +19,8 @@ def main():
     client = OpenAI(api_key=API_KEY, base_url=BASE_URL)
 
     chat = client.chat.completions.create(
-        # model="anthropic/claude-haiku-4.5",
-        model="arcee-ai/trinity-large-preview:free",
+        model="anthropic/claude-haiku-4.5",
+        # model="arcee-ai/trinity-large-preview:free",
         messages=[{"role": "user", "content": args.p}],
         tools=[
             {
