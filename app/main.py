@@ -19,7 +19,7 @@ def main():
     client = OpenAI(api_key=API_KEY, base_url=BASE_URL)
 
     chat = client.chat.completions.create(
-        model="anthropic/claude-haiku-4.5",
+        model="arcee-ai/trinity-large-preview:free",
         messages=[{"role": "user", "content": args.p}],
     )
 
@@ -30,8 +30,7 @@ def main():
     print("Logs from your program will appear here!", file=sys.stderr)
 
     # TODO: Uncomment the following line to pass the first stage
-    # print(chat.choices[0].message.content)
-
+    print(chat.choices[0].message.content)
 
 if __name__ == "__main__":
     main()
