@@ -51,14 +51,14 @@ def main():
 
     # TODO: Uncomment the following line to pass the first stage
     print(chat.choices[0].message.content)
-    print(chat.choices[0])
+    # print(chat.choices[0])
 
     for tc in chat.choices[0].message.tool_calls or []:
         
         args = json.loads(tc.function.arguments)
-        print(f"Tool call: {args}")
+        # print(f"Tool call: {args}")
         if tc.function.name == "Read":
-            print(f"Reading {args['file_path']}")
+            # print(f"Reading {args['file_path']}")
             with open(args["file_path"]) as f:
                 print(f.read())
 
