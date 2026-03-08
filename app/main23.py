@@ -24,21 +24,17 @@ def main():
         {
             "type": "function",
             "function": {
-                "name": "Write",
-                "description": "Write content to a file",
+                "name": "Read",
+                "description": "Read and return the contents of a file",
                 "parameters": {
-                    "type": "object",
-                    "required": ["file_path", "content"],
-                    "properties": {
-                        "file_path": {
-                            "type": "string",
-                            "description": "The path of the file to write to"
-                        },
-                        "content": {
-                            "type": "string",
-                            "description": "The content to write to the file"
-                        }
+                "type": "object",
+                "properties": {
+                    "file_path": {
+                    "type": "string",
+                    "description": "The path to the file to read"
                     }
+                },
+                "required": ["file_path"]
                 }
             }
         }
@@ -61,9 +57,9 @@ def main():
     if tool_calls:
         for tc in tool_calls:
             args = json.loads(tc.function.arguments)
-            if tc.function.name == "Write":
-                with open(args["file_path"], "w") as f:
-                    f.write(args["content"])
+            if tc.function.name == "Read":
+                with open(args["file_path"]) as f:
+                    print(f.read())
     else:
         print(chat.choices[0].message.content)
     
