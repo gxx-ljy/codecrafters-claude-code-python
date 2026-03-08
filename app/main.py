@@ -53,16 +53,15 @@ def main():
     # print(chat.choices[0].message.content)
     # print(chat.choices[0])
 
-    for tc in chat.choices[0].message.tool_calls or []:
-        
-        args = json.loads(tc.function.arguments)
-        # print(f"Tool call: {args}")
-        if tc.function.name == "Read":
-            # print(f"Reading {args['file_path']}")
-            with open(args["file_path"]) as f:
-                print(f.read())
-        else:
-            print(chat.choices[0].message.content)
+    tool_calls = chat.choices[0].message.tool_calls
+    if tool_calls:
+        for tc in tool_calls:
+            args = json.loads(tc.function.arguments)
+            if tc.function.name == "Read":
+                with open(args["file_path"]) as f:
+                    print(f.read())
+    else:
+        print(chat.choices[0].message.content)
 
 if __name__ == "__main__":
     main()
