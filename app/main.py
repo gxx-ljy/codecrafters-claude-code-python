@@ -18,7 +18,6 @@ def main():
 
     client = OpenAI(api_key=API_KEY, base_url=BASE_URL)
     messages = [
-        { "role": "user", "content": "Summarize the README for me." },
         {"role": "user", "content": args.p}
     ]
     while True:
@@ -68,14 +67,16 @@ def main():
     #     print(chat.choices[0].message.content)
     
         tool_calls = chat.choices[0].message.tool_calls
+        content = chat.choices[0].message.content
         if tool_calls:
             for tc in tool_calls:
                 args = json.loads(tc.function.arguments)
                 if tc.function.name == "Read":
                     with open(args["file_path"]) as f:
-                        content = f.read()
+                        tool_result = f.read()
                     tool_call_id = tc.id
-                    messages.append({"role": "tool", "tool_call_id": tool_call_id, "content": content})
+                    messages.append({"role": "assistant", "content": content})
+                    messages.append({"role": "tool", "tool_call_id": tool_call_id, "content": tool_result})
         else:
             print(chat.choices[0].message.content)
             break
