@@ -19,7 +19,7 @@ def main():
     client = OpenAI(api_key=API_KEY, base_url=BASE_URL)
     messages = [
         { "role": "user", "content": "Summarize the README for me." },
-        # {"role": "user", "content": args.p}
+        {"role": "user", "content": args.p}
     ]
     while True:
         chat = client.chat.completions.create(
@@ -74,8 +74,11 @@ def main():
                 if tc.function.name == "Read":
                     with open(args["file_path"]) as f:
                         content = f.read()
-                    too_call_id = tc.id
-                    messages.append({"role": "tool", "tool_call_id": too_call_id, "content": content})
+                    tool_call_id = tc.id
+                    messages.append({"role": "tool", "tool_call_id": tool_call_id, "content": content})
+        else:
+            print(chat.choices[0].message.content)
+            break
 
 
 if __name__ == "__main__":
