@@ -1,7 +1,7 @@
 import argparse
 import os
 import sys
-
+import json
 from openai import OpenAI
 
 API_KEY = os.getenv("OPENROUTER_API_KEY")
@@ -19,8 +19,8 @@ def main():
     client = OpenAI(api_key=API_KEY, base_url=BASE_URL)
 
     chat = client.chat.completions.create(
-        model="anthropic/claude-haiku-4.5",
-        # model="arcee-ai/trinity-large-preview:free",
+        # model="anthropic/claude-haiku-4.5",
+        model="arcee-ai/trinity-large-preview:free",
         messages=[{"role": "user", "content": args.p}],
         tools=[
             {
@@ -51,6 +51,16 @@ def main():
 
     # TODO: Uncomment the following line to pass the first stage
     print(chat.choices[0].message.content)
+    print(chat.choices[0])
+
+    for tc in chat.choices[0].message.tool_calls or []:
+        
+        args = json.loads(tc.function.arguments)
+        print(f"Tool call: {args}")
+        if tc.function.name == "Read":
+            print(f"Reading {args['file_path']}")
+            with open(args["file_path"]) as f:
+                print(f.read())
 
 if __name__ == "__main__":
     main()
