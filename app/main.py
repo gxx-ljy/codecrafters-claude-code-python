@@ -69,6 +69,7 @@ def main():
         tool_calls = chat.choices[0].message.tool_calls
         
         if tool_calls:
+            content = chat.choices[0].message.content
             assistant_message = {
                 "role": "assistant",
                 "content": content,
@@ -91,7 +92,6 @@ def main():
                     with open(args["file_path"]) as f:
                         tool_result = f.read()
                     tool_call_id = tc.id
-                    content = chat.choices[0].message.content
                     
                     messages.append({"role": "tool", "tool_call_id": tool_call_id, "content": tool_result})
         else:
