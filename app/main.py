@@ -50,10 +50,10 @@ def main():
     print("Logs from your program will appear here!", file=sys.stderr)
 
     # TODO: Uncomment the following line to pass the first stage
-    print(chat.choices[0].message.content)
+    # print(chat.choices[0].message.content)
     # print(chat.choices[0])
 
-    for tc in chat.choices[0].message.tool_calls or []:
+    if chat.choices[0].message.tool_calls:
         
         args = json.loads(tc.function.arguments)
         # print(f"Tool call: {args}")
@@ -61,6 +61,8 @@ def main():
             # print(f"Reading {args['file_path']}")
             with open(args["file_path"]) as f:
                 print(f.read())
+    else:
+        print(chat.choices[0].message.content)
 
 if __name__ == "__main__":
     main()
