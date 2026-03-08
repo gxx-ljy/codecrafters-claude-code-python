@@ -24,6 +24,23 @@ def main():
         {
             "type": "function",
             "function": {
+                "name": "Read",
+                "description": "Read and return the contents of a file",
+                "parameters": {
+                "type": "object",
+                "properties": {
+                    "file_path": {
+                    "type": "string",
+                    "description": "The path to the file to read"
+                    }
+                },
+                "required": ["file_path"]
+                }
+            }
+        },
+        {
+            "type": "function",
+            "function": {
                 "name": "Write",
                 "description": "Write content to a file",
                 "parameters": {
@@ -43,30 +60,55 @@ def main():
             }
         }
     ]
+    while True:
+        chat = client.chat.completions.create(
+            model="anthropic/claude-haiku-4.5",
+            # model="arcee-ai/trinity-large-preview:free",
+            messages=messages,
+            tools=tools,
+        )
 
-    chat = client.chat.completions.create(
-        model="anthropic/claude-haiku-4.5",
-        # model="arcee-ai/trinity-large-preview:free",
-        messages=messages,
-        tools=tools,
-    )
+        if not chat.choices or len(chat.choices) == 0:
+            raise RuntimeError("no choices in response")
 
-    if not chat.choices or len(chat.choices) == 0:
-        raise RuntimeError("no choices in response")
-
-    # You can use print statements as follows for debugging, they'll be visible when running tests.
-    print("Logs from your program will appear here!", file=sys.stderr)
-
-    tool_calls = chat.choices[0].message.tool_calls
-    if tool_calls:
-        for tc in tool_calls:
-            args = json.loads(tc.function.arguments)
-            if tc.function.name == "Write":
-                with open(args["file_path"], "w") as f:
-                    f.write(args["content"])
-    else:
-        print(chat.choices[0].message.content)
+        # You can use print statements as follows for debugging, they'll be visible when running tests.
+        print("Logs from your program will appear here!", file=sys.stderr)
     
+        tool_calls = chat.choices[0].message.tool_calls
+        
+        if tool_calls:
+            content = chat.choices[0].message.content
+            assistant_message = {
+                "role": "assistant",
+                "content": content,
+                "tool_calls": [
+                    {
+                        "id": tc.id,
+                        "type": "function",
+                        "function": {
+                            "name": tc.function.name,
+                            "arguments": tc.function.arguments
+                        }
+                    }
+                    for tc in tool_calls
+                ]
+            }
+            messages.append(assistant_message)
+            for tc in tool_calls:
+                args = json.loads(tc.function.arguments)
+                if tc.function.name == "Read":
+                    with open(args["file_path"]) as f:
+                        tool_result = f.read()
+                    
+                    messages.append({"role": "tool", "tool_call_id": tc.id, "content": tool_result})
+                elif tc.function.name == "Write":
+                    with open(args["file_path"], "w") as f:
+                        f.write(args["content"])
+                    
+                    messages.append({"role": "tool", "tool_call_id": tc.id, "content": "OK"})
+        else:
+            print(chat.choices[0].message.content)
+            break
 
 
 if __name__ == "__main__":
